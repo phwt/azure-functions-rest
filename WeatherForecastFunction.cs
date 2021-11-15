@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Linq;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.OpenApi.Models;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using System.Net;
 
 namespace azure_functions_dotnet_rest_api
 {
@@ -19,15 +23,19 @@ namespace azure_functions_dotnet_rest_api
         };
 
         [FunctionName("WeatherForecast")]
+        [OpenApiOperation(operationId: "Run")]
+        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
+            Description = "The OK response message containing a JSON result.")]
         public static IActionResult WeatherForecastFn(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "weather")] HttpRequest req,
             ILogger log)
         {
             var rng = new Random();
             var result = Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
+                TemperatureC = 9,
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
