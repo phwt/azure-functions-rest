@@ -1,4 +1,6 @@
+using System.IO;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using azure_functions_dotnet_rest_api.Models;
 using azure_functions_dotnet_rest_api.Services;
@@ -19,18 +21,45 @@ namespace azure_functions_dotnet_rest_api
             this._weatherForecastService = weatherForecastService;
         }
 
-        [Function("WeatherForecast")]
-        [OpenApiOperation(operationId: "Run")]
+        [Function("WeatherForecastGet")]
+        [OpenApiOperation(tags: new[] { "forecast" })]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast[]),
             Description = "The OK response message containing a JSON result.")]
-        public async Task<HttpResponseData> WeatherForecastFn([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "weather")] HttpRequestData req,
+        public async Task<HttpResponseData> WeatherForecastGet([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
                                                         FunctionContext executionContext)
         {
             var result = await this._weatherForecastService.Predict();
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(result);
+
+            return response;
+        }
+
+        [Function("WeatherForecastPost")]
+        [OpenApiOperation(tags: new[] { "forecast" })]
+        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiRequestBodyAttribute(contentType: "application/json", bodyType: typeof(WeatherForecast))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
+            Description = "The OK response message containing a JSON result.")]
+        public async Task<HttpResponseData> WeatherForecastPost([HttpTrigger(AuthorizationLevel.Function, "post", Route = "weather")] HttpRequestData req,
+                                                        FunctionContext executionContext)
+        {
+            var result = await this._weatherForecastService.Predict();
+
+            WeatherForecast body;
+            using (StreamReader reader = new StreamReader(req.Body))
+            {
+                var bodyString = reader.ReadToEnd();
+                body = JsonSerializer.Deserialize<WeatherForecast>(bodyString, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(body);
 
             return response;
         }
