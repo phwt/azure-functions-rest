@@ -1,6 +1,6 @@
 using System;
 
-namespace azure_functions_dotnet_rest_api
+namespace azure_functions_dotnet_rest_api.Models
 {
     public class WeatherForecast
     {
