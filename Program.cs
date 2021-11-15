@@ -5,6 +5,7 @@ using Microsoft.Azure.Functions.Worker.Configuration;
 using AzureFunctionsREST.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
+using System;
 
 namespace AzureFunctionsREST
 {
@@ -19,6 +20,7 @@ namespace AzureFunctionsREST
                             {
                                 services.AddTransient<WeatherForecastService>();
                             })
+                            .ConfigureAppConfiguration(builder => builder.AddEnvironmentVariables())
                             .Build();
 
             host.Run();
