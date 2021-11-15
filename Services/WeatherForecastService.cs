@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using azure_functions_dotnet_rest_api.Models;
+using AzureFunctionsREST.Models;
 
-namespace azure_functions_dotnet_rest_api.Services
+namespace AzureFunctionsREST.Services
 {
     public class WeatherForecastService
     {

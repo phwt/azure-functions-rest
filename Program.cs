@@ -2,11 +2,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Azure.Functions.Worker.Configuration;
-using azure_functions_dotnet_rest_api.Services;
+using AzureFunctionsREST.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
 
-namespace azure_functions_dotnet_rest_api
+namespace AzureFunctionsREST
 {
     public class Program
     {
