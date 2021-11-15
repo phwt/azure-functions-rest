@@ -22,14 +22,14 @@ namespace AzureFunctionsREST
         }
 
         [Function("WeatherForecastGet")]
-        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Retrieve weather forecast of the next 5 days")]
+        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Retrieve all weather forecasts")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast[]),
-            Description = "Weather forecast of the next 5 days")]
+            Description = "All weather forecasts")]
         public async Task<HttpResponseData> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
                                                 FunctionContext executionContext)
         {
-            var result = await this._weatherForecastService.Predict();
+            var result = this._weatherForecastService.Get();
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(result);
@@ -38,7 +38,7 @@ namespace AzureFunctionsREST
         }
 
         [Function("WeatherForecastPost")]
-        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create new weather forecast")]
+        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecast))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
@@ -46,18 +46,20 @@ namespace AzureFunctionsREST
         public async Task<HttpResponseData> Post([HttpTrigger(AuthorizationLevel.Function, "post", Route = "weather")] HttpRequestData req,
                                                  FunctionContext executionContext)
         {
-            WeatherForecast body;
+            WeatherForecast weatherForecast;
             using (StreamReader reader = new StreamReader(req.Body))
             {
                 var bodyString = reader.ReadToEnd();
-                body = JsonSerializer.Deserialize<WeatherForecast>(bodyString, new JsonSerializerOptions
+                weatherForecast = JsonSerializer.Deserialize<WeatherForecast>(bodyString, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
             }
 
+            _weatherForecastService.Create(weatherForecast);
+
             var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(body);
+            await response.WriteAsJsonAsync(weatherForecast);
 
             return response;
         }

@@ -2,28 +2,31 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AzureFunctionsREST.Models;
+using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
 
 namespace AzureFunctionsREST.Services
 {
     public class WeatherForecastService
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-        public async Task<WeatherForecast[]> Predict()
-        {
-            await Task.Delay(1000);
-            var rng = new Random();
-            var result = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = 9,
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+        private readonly IMongoCollection<WeatherForecast> _forecasts;
 
-            return result;
+        public WeatherForecastService(IConfiguration configuration)
+        {
+            var client = new MongoClient(configuration["MONGODB_CONNECTION_STRING"]);
+            var database = client.GetDatabase(configuration["MONGODB_DBNAME"]);
+            this._forecasts = database.GetCollection<WeatherForecast>(configuration["MONGODB_COLLECTION_NAME"]);
+        }
+
+        public WeatherForecast[] Get()
+        {
+            return _forecasts.Find(_ => true).ToEnumerable().ToArray();
+        }
+
+        public WeatherForecast Create(WeatherForecast weatherForecast)
+        {
+            _forecasts.InsertOne(weatherForecast);
+            return weatherForecast;
         }
     }
 }
