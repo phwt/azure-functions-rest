@@ -22,12 +22,12 @@ namespace azure_functions_dotnet_rest_api
         }
 
         [Function("WeatherForecastGet")]
-        [OpenApiOperation(tags: new[] { "forecast" })]
+        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Retrieve weather forecast of the next 5 days")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast[]),
-            Description = "The OK response message containing a JSON result.")]
-        public async Task<HttpResponseData> WeatherForecastGet([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
-                                                        FunctionContext executionContext)
+            Description = "Weather forecast of the next 5 days")]
+        public async Task<HttpResponseData> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
+                                                FunctionContext executionContext)
         {
             var result = await this._weatherForecastService.Predict();
 
@@ -38,16 +38,14 @@ namespace azure_functions_dotnet_rest_api
         }
 
         [Function("WeatherForecastPost")]
-        [OpenApiOperation(tags: new[] { "forecast" })]
+        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create new weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiRequestBodyAttribute(contentType: "application/json", bodyType: typeof(WeatherForecast))]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecast))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
-            Description = "The OK response message containing a JSON result.")]
-        public async Task<HttpResponseData> WeatherForecastPost([HttpTrigger(AuthorizationLevel.Function, "post", Route = "weather")] HttpRequestData req,
-                                                        FunctionContext executionContext)
+            Description = "Created weather forecast")]
+        public async Task<HttpResponseData> Post([HttpTrigger(AuthorizationLevel.Function, "post", Route = "weather")] HttpRequestData req,
+                                                 FunctionContext executionContext)
         {
-            var result = await this._weatherForecastService.Predict();
-
             WeatherForecast body;
             using (StreamReader reader = new StreamReader(req.Body))
             {
