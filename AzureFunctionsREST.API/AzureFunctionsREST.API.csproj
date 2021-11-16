@@ -12,7 +12,6 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.OpenApi" Version="0.8.1-preview" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.0.1" OutputItemType="Analyzer" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -22,6 +21,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AzureFunctionsREST.Domain\AzureFunctionsREST.Domain.csproj" />
+    <ProjectReference Include="..\AzureFunctionsREST.Infrastructure\AzureFunctionsREST.Infrastructure.csproj" />
   </ItemGroup>
 
   <Target Name="RunFunctions">
