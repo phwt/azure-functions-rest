@@ -1,6 +1,4 @@
-using System.IO;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
 using AzureFunctionsREST.Domain.Models;
 using AzureFunctionsREST.Infrastructure.Repositories;
@@ -13,7 +11,7 @@ using MongoDB.Bson;
 
 namespace AzureFunctionsREST.API.Functions
 {
-    public class WeatherForecastFunction
+    public class WeatherForecastFunction : BaseFunction
     {
         private readonly WeatherForecastRepository _weatherForecastRepository;
 
@@ -47,7 +45,7 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
                                                 FunctionContext executionContext)
         {
-            string weatherForecastId = executionContext.BindingContext.BindingData["weatherForecastId"].ToString();
+            string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
             var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId));
 
             var response = req.CreateResponse(HttpStatusCode.OK);
@@ -65,17 +63,8 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> Post([HttpTrigger(AuthorizationLevel.Function, "post", Route = "weather")] HttpRequestData req,
                                                  FunctionContext executionContext)
         {
-            WeatherForecast weatherForecast;
-            using (StreamReader reader = new StreamReader(req.Body))
-            {
-                var bodyString = reader.ReadToEnd();
-                weatherForecast = JsonSerializer.Deserialize<WeatherForecast>(bodyString, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-            }
-
-            WeatherForecast result = this._weatherForecastRepository.Add(weatherForecast);
+            var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
+            var result = this._weatherForecastRepository.Add(weatherForecast);
 
             var response = req.CreateResponse(HttpStatusCode.Created);
             await response.WriteAsJsonAsync(result);
@@ -92,19 +81,10 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> Put([HttpTrigger(AuthorizationLevel.Function, "put", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
                                                  FunctionContext executionContext)
         {
-            string weatherForecastId = executionContext.BindingContext.BindingData["weatherForecastId"].ToString();
+            string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
 
-            WeatherForecast weatherForecast;
-            using (StreamReader reader = new StreamReader(req.Body))
-            {
-                var bodyString = reader.ReadToEnd();
-                weatherForecast = JsonSerializer.Deserialize<WeatherForecast>(bodyString, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-            }
-
-            WeatherForecast result = this._weatherForecastRepository.Update(weatherForecast);
+            var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
+            var result = this._weatherForecastRepository.Update(weatherForecast);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(result);
