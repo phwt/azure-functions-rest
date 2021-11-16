@@ -44,5 +44,9 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
                                                     entity,
                                                     new FindOneAndReplaceOptions<T, T>() { ReturnDocument = ReturnDocument.After });
         }
+
+        public virtual T Delete(ObjectId id){
+            return _collection.FindOneAndDelete(document => document.Id.Equals(id)); // TODO: Change to mark as deleted
+        }
     }
 }

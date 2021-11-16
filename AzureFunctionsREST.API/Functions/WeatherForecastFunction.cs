@@ -26,7 +26,7 @@ namespace AzureFunctionsREST.API.Functions
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast[]),
             Description = "All weather forecasts")]
         public async Task<HttpResponseData> List([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
-                                                FunctionContext executionContext)
+                                                 FunctionContext executionContext)
         {
             var result = this._weatherForecastRepository.All();
 
@@ -57,6 +57,7 @@ namespace AzureFunctionsREST.API.Functions
         [Function("WeatherForecastPost")]
         [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecast))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
             Description = "Created weather forecast")]
@@ -75,6 +76,7 @@ namespace AzureFunctionsREST.API.Functions
         [Function("WeatherForecastPut")]
         [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecast))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
             Description = "Created weather forecast")]
@@ -85,6 +87,24 @@ namespace AzureFunctionsREST.API.Functions
 
             var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
             var result = this._weatherForecastRepository.Update(weatherForecast);
+
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(result);
+
+            return response;
+        }
+
+        [Function("WeatherForecastDelete")]
+        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
+        [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
+        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
+            Description = "Deleted weather forecast")]
+        public async Task<HttpResponseData> Delete([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
+                                                   FunctionContext executionContext)
+        {
+            string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
+            var result = this._weatherForecastRepository.Delete(new ObjectId(weatherForecastId));
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(result);
