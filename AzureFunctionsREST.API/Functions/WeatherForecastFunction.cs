@@ -3,22 +3,22 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzureFunctionsREST.Domain.Models;
-using AzureFunctionsREST.Domain.Services;
+using AzureFunctionsREST.Infrastructure.Repositories;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.OpenApi.Models;
 
-namespace AzureFunctionsREST.API
+namespace AzureFunctionsREST.API.Functions
 {
     public class WeatherForecastFunction
     {
-        private readonly WeatherForecastService _weatherForecastService;
+        private readonly WeatherForecastRepository _weatherForecastRepository;
 
-        public WeatherForecastFunction(WeatherForecastService weatherForecastService)
+        public WeatherForecastFunction(WeatherForecastRepository weatherForecastRepository)
         {
-            this._weatherForecastService = weatherForecastService;
+            this._weatherForecastRepository = weatherForecastRepository;
         }
 
         [Function("WeatherForecastGet")]
@@ -29,7 +29,7 @@ namespace AzureFunctionsREST.API
         public async Task<HttpResponseData> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
                                                 FunctionContext executionContext)
         {
-            var result = this._weatherForecastService.Get();
+            var result = this._weatherForecastRepository.All();
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(result);
@@ -56,7 +56,7 @@ namespace AzureFunctionsREST.API
                 });
             }
 
-            _weatherForecastService.Create(weatherForecast);
+            this._weatherForecastRepository.Add(weatherForecast);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(weatherForecast);

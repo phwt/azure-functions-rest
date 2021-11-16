@@ -1,11 +1,8 @@
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Azure.Functions.Worker.Configuration;
-using AzureFunctionsREST.Domain.Services;
+using AzureFunctionsREST.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
-using System;
 
 namespace AzureFunctionsREST.API
 {
@@ -18,7 +15,7 @@ namespace AzureFunctionsREST.API
                             .ConfigureOpenApi()
                             .ConfigureServices(services =>
                             {
-                                services.AddTransient<WeatherForecastService>();
+                                services.AddTransient<WeatherForecastRepository>(); // TODO: Specify repository interface
                             })
                             .ConfigureAppConfiguration(builder => builder.AddEnvironmentVariables())
                             .Build();
