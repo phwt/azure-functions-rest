@@ -29,12 +29,12 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> List([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
                                                  FunctionContext executionContext)
         {
-            var result = this._weatherForecastRepository.All();
-
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(result);
-
-            return response;
+            return await RequestWrapper(req, async response =>
+            {
+                var result = this._weatherForecastRepository.All();
+                await response.WriteAsJsonAsync(result);
+                return response;
+            });
         }
 
         [Function("WeatherForecastGet")]
@@ -46,13 +46,14 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
                                                 FunctionContext executionContext)
         {
-            string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
-            var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId));
+            return await RequestWrapper(req, async response =>
+            {
+                string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(result);
-
-            return response;
+                var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId));
+                await response.WriteAsJsonAsync(result);
+                return response;
+            });
         }
 
         [Function("WeatherForecastPost")]
@@ -64,13 +65,14 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> Post([HttpTrigger(AuthorizationLevel.Function, "post", Route = "weather")] HttpRequestData req,
                                                  FunctionContext executionContext)
         {
-            var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
-            var result = this._weatherForecastRepository.Add(weatherForecast);
+            return await RequestWrapper(req, async response =>
+            {
+                var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
+                var result = this._weatherForecastRepository.Add(weatherForecast);
 
-            var response = req.CreateResponse(HttpStatusCode.Created);
-            await response.WriteAsJsonAsync(result);
-
-            return response;
+                await response.WriteAsJsonAsync(result);
+                return response;
+            });
         }
 
         [Function("WeatherForecastPut")]
@@ -83,16 +85,17 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> Put([HttpTrigger(AuthorizationLevel.Function, "put", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
                                                  FunctionContext executionContext)
         {
-            string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
+            return await RequestWrapper(req, async response =>
+            {
+                string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
 
-            var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
-            weatherForecast.Id = weatherForecastId;
-            var result = this._weatherForecastRepository.Update(weatherForecast);
+                var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
+                weatherForecast.Id = weatherForecastId;
+                var result = this._weatherForecastRepository.Update(weatherForecast);
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(result);
-
-            return response;
+                await response.WriteAsJsonAsync(result);
+                return response;
+            });
         }
 
         [Function("WeatherForecastDelete")]
@@ -104,13 +107,13 @@ namespace AzureFunctionsREST.API.Functions
         public async Task<HttpResponseData> Delete([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
                                                    FunctionContext executionContext)
         {
-            string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
-            var result = this._weatherForecastRepository.Delete(new ObjectId(weatherForecastId));
-
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(result);
-
-            return response;
+            return await RequestWrapper(req, async response =>
+            {
+                string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
+                var result = this._weatherForecastRepository.Delete(new ObjectId(weatherForecastId));
+                await response.WriteAsJsonAsync(result);
+                return response;
+            });
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using AzureFunctionsREST.Domain.Exceptions;
 using AzureFunctionsREST.Domain.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -35,18 +36,25 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
 
         public virtual T Get(ObjectId id)
         {
-            return _collection.Find(document => document.Id.Equals(id)).FirstOrDefault();
+            var document = _collection.Find(document => document.Id.Equals(id)).FirstOrDefault();
+            if (document == null) throw new DocumentNotFoundException();
+            return document;
         }
 
         public virtual T Update(T entity)
         {
-            return _collection.FindOneAndReplace<T>(document => document.Id.Equals(entity.Id),
+            var updatedDocument = _collection.FindOneAndReplace<T>(document => document.Id.Equals(entity.Id),
                                                     entity,
                                                     new FindOneAndReplaceOptions<T, T>() { ReturnDocument = ReturnDocument.After });
+            if (updatedDocument == null) throw new DocumentNotFoundException();
+            return updatedDocument;
         }
 
-        public virtual T Delete(ObjectId id){
-            return _collection.FindOneAndDelete(document => document.Id.Equals(id)); // TODO: Change to mark as deleted
+        public virtual T Delete(ObjectId id)
+        {
+            var deletedDocument = _collection.FindOneAndDelete(document => document.Id.Equals(id)); // TODO: Change to mark as deleted
+            if (deletedDocument == null) throw new DocumentNotFoundException();
+            return deletedDocument;
         }
     }
 }
