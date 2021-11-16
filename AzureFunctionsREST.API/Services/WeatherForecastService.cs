@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AzureFunctionsREST.Models;
+using AzureFunctionsREST.API.Models;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
-namespace AzureFunctionsREST.Services
+namespace AzureFunctionsREST.API.Services
 {
     public class WeatherForecastService
     {

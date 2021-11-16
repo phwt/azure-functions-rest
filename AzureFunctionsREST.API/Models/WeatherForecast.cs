@@ -2,7 +2,7 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace AzureFunctionsREST.Models
+namespace AzureFunctionsREST.API.Models
 {
     public class WeatherForecast
     {

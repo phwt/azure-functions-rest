@@ -2,15 +2,15 @@ using System.IO;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AzureFunctionsREST.Models;
-using AzureFunctionsREST.Services;
+using AzureFunctionsREST.API.Models;
+using AzureFunctionsREST.API.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.OpenApi.Models;
 
-namespace AzureFunctionsREST
+namespace AzureFunctionsREST.API
 {
     public class WeatherForecastFunction
     {
