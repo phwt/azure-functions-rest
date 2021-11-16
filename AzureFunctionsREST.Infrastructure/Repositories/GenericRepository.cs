@@ -40,7 +40,9 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
 
         public virtual T Update(T entity)
         {
-            return _collection.FindOneAndReplace(document => document.Id.Equals(entity.Id), entity);
+            return _collection.FindOneAndReplace<T>(document => document.Id.Equals(entity.Id),
+                                                    entity,
+                                                    new FindOneAndReplaceOptions<T, T>() { ReturnDocument = ReturnDocument.After });
         }
     }
 }
