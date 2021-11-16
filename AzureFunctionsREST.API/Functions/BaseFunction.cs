@@ -27,15 +27,31 @@ namespace AzureFunctionsREST.API.Functions
 
         protected IReadOnlyDictionary<string, object> ExtractBindingData(FunctionContext functionContext) => functionContext.BindingContext.BindingData;
 
-        protected async Task<HttpResponseData> RequestWrapper(HttpRequestData requestData, Func<HttpResponseData, Task<HttpResponseData>> requestHandler) {
+        private HttpResponseData BuildErrorResponse(HttpRequestData requestData, Exception exception, HttpStatusCode statusCode)
+        {
+            var response = requestData.CreateResponse(statusCode);
+            response.WriteString(exception.Message);
+            return response;
+        }
+
+        protected async Task<HttpResponseData> RequestWrapper(HttpRequestData requestData, Func<HttpResponseData, Task<HttpResponseData>> requestHandler)
+        {
             try
             {
                 var response = requestData.CreateResponse(HttpStatusCode.OK);
                 return await requestHandler(response);
             }
-            catch (DocumentNotFoundException)
+            catch (DocumentNotFoundException exception)
             {
-                return requestData.CreateResponse(HttpStatusCode.NotFound);
+                return BuildErrorResponse(requestData, exception, HttpStatusCode.NotFound);
+            }
+            catch (FormatException exception)
+            {
+                return BuildErrorResponse(requestData, exception, HttpStatusCode.BadRequest);
+            }
+            catch (JsonException exception)
+            {
+                return BuildErrorResponse(requestData, exception, HttpStatusCode.UnprocessableEntity);
             }
             catch (System.Exception)
             {
