@@ -1,5 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
+using AzureFunctionsREST.API.Models;
 using AzureFunctionsREST.Domain.Models;
 using AzureFunctionsREST.Infrastructure.Repositories;
 using Microsoft.Azure.Functions.Worker;
@@ -57,8 +58,7 @@ namespace AzureFunctionsREST.API.Functions
         [Function("WeatherForecastPost")]
         [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecast))]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecastRequest))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
             Description = "Created weather forecast")]
         public async Task<HttpResponseData> Post([HttpTrigger(AuthorizationLevel.Function, "post", Route = "weather")] HttpRequestData req,
@@ -77,7 +77,7 @@ namespace AzureFunctionsREST.API.Functions
         [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecast))]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecastRequest))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
             Description = "Created weather forecast")]
         public async Task<HttpResponseData> Put([HttpTrigger(AuthorizationLevel.Function, "put", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
@@ -86,6 +86,7 @@ namespace AzureFunctionsREST.API.Functions
             string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
 
             var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
+            weatherForecast.Id = weatherForecastId;
             var result = this._weatherForecastRepository.Update(weatherForecast);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
