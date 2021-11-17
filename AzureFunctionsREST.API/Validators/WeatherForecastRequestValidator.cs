@@ -12,6 +12,7 @@ namespace AzureFunctionsREST.API.Validators
             RuleFor(forecast => forecast.TemperatureC).InclusiveBetween(-100, 100)
                                                       .WithMessage("The specified temperature is exceed lowest/highest temperature ever recorded. Go somewhere else instead of logging the forecast.");
             RuleFor(forecast => forecast.Summary).NotEmpty().WithMessage("Forecast summary must be specified");
+            RuleFor(forecast => forecast.Reporter).NotEmpty();
         }
     }
 }

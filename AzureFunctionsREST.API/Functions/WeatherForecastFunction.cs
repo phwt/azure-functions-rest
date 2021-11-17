@@ -74,7 +74,8 @@ namespace AzureFunctionsREST.API.Functions
                 {
                     Date = weatherForecastRequest.Date,
                     TemperatureC = weatherForecastRequest.TemperatureC,
-                    Summary = weatherForecastRequest.Summary
+                    Summary = weatherForecastRequest.Summary,
+                    Reporter = weatherForecastRequest.Reporter
                 });
 
                 await response.WriteAsJsonAsync(result);
@@ -102,7 +103,8 @@ namespace AzureFunctionsREST.API.Functions
                     Id = weatherForecastId,
                     Date = weatherForecastRequest.Date,
                     TemperatureC = weatherForecastRequest.TemperatureC,
-                    Summary = weatherForecastRequest.Summary
+                    Summary = weatherForecastRequest.Summary,
+                    Reporter = weatherForecastRequest.Reporter
                 });
 
                 await response.WriteAsJsonAsync(result);
