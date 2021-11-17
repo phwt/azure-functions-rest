@@ -15,7 +15,9 @@ namespace AzureFunctionsREST.API
                             .ConfigureOpenApi()
                             .ConfigureServices(services =>
                             {
-                                services.AddTransient<WeatherForecastRepository>(); // TODO: Specify repository interface
+                                // TODO: Specify repository interface
+                                services.AddTransient<WeatherForecastRepository>(); 
+                                services.AddTransient<ReporterRepository>(); 
                             })
                             .ConfigureAppConfiguration(builder => builder.AddEnvironmentVariables())
                             .Build();

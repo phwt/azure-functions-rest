@@ -83,12 +83,12 @@ namespace AzureFunctionsREST.API.Functions
         }
 
         [Function("WeatherForecastPut")]
-        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
+        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Update a weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(WeatherForecastRequest))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
-            Description = "Created weather forecast")]
+            Description = "Updated weather forecast")]
         public async Task<HttpResponseData> Put([HttpTrigger(AuthorizationLevel.Function, "put", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
                                                  FunctionContext executionContext)
         {
@@ -111,7 +111,7 @@ namespace AzureFunctionsREST.API.Functions
         }
 
         [Function("WeatherForecastDelete")]
-        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Create a new weather forecast")]
+        [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Delete a weather forecast")]
         [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
