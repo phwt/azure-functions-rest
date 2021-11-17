@@ -27,11 +27,11 @@ namespace AzureFunctionsREST.API.Functions
         }
 
         protected TDeserializeType DeserializeBody<TDeserializeType, TValidator>(Stream body)
-            where TValidator: AbstractValidator<TDeserializeType>
+            where TValidator : AbstractValidator<TDeserializeType>
         {
             TDeserializeType deserializedBody = DeserializeBody<TDeserializeType>(body);
 
-            TValidator validator = (TValidator) Activator.CreateInstance(typeof(TValidator), new object());
+            TValidator validator = (TValidator)Activator.CreateInstance(typeof(TValidator), new object[] { });
             validator.ValidateAndThrow(deserializedBody);
 
             return deserializedBody;
