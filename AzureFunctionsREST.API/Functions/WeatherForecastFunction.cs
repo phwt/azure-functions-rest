@@ -1,6 +1,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using AzureFunctionsREST.API.Models;
+using AzureFunctionsREST.API.Validators;
 using AzureFunctionsREST.Domain.Models;
 using AzureFunctionsREST.Infrastructure.Repositories;
 using Microsoft.Azure.Functions.Worker;
@@ -67,8 +68,14 @@ namespace AzureFunctionsREST.API.Functions
         {
             return await RequestWrapper(req, async response =>
             {
-                var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
-                var result = this._weatherForecastRepository.Add(weatherForecast);
+                var weatherForecastRequest = DeserializeBody<WeatherForecastRequest, WeatherForecastRequestValidator>(req.Body);
+
+                var result = this._weatherForecastRepository.Add(new WeatherForecast()
+                {
+                    Date = weatherForecastRequest.Date,
+                    TemperatureC = weatherForecastRequest.TemperatureC,
+                    Summary = weatherForecastRequest.Summary
+                });
 
                 await response.WriteAsJsonAsync(result);
                 return response;
@@ -89,9 +96,14 @@ namespace AzureFunctionsREST.API.Functions
             {
                 string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
 
-                var weatherForecast = DeserializeBody<WeatherForecast>(req.Body);
-                weatherForecast.Id = weatherForecastId;
-                var result = this._weatherForecastRepository.Update(weatherForecast);
+                var weatherForecastRequest = DeserializeBody<WeatherForecastRequest, WeatherForecastRequestValidator>(req.Body);
+                var result = this._weatherForecastRepository.Update(new WeatherForecast()
+                {
+                    Id = weatherForecastId,
+                    Date = weatherForecastRequest.Date,
+                    TemperatureC = weatherForecastRequest.TemperatureC,
+                    Summary = weatherForecastRequest.Summary
+                });
 
                 await response.WriteAsJsonAsync(result);
                 return response;

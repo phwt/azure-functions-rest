@@ -8,6 +8,7 @@
     <RootNamespace>AzureFunctionsREST</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="10.3.4" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.12" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.OpenApi" Version="0.8.1-preview" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.0.1" OutputItemType="Analyzer" />

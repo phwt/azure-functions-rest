@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzureFunctionsREST.Domain.Exceptions;
+using FluentValidation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -23,6 +24,17 @@ namespace AzureFunctionsREST.API.Functions
                     PropertyNameCaseInsensitive = true
                 });
             }
+        }
+
+        protected TDeserializeType DeserializeBody<TDeserializeType, TValidator>(Stream body)
+            where TValidator: AbstractValidator<TDeserializeType>
+        {
+            TDeserializeType deserializedBody = DeserializeBody<TDeserializeType>(body);
+
+            TValidator validator = (TValidator) Activator.CreateInstance(typeof(TValidator), new object());
+            validator.ValidateAndThrow(deserializedBody);
+
+            return deserializedBody;
         }
 
         protected IReadOnlyDictionary<string, object> ExtractBindingData(FunctionContext functionContext) => functionContext.BindingContext.BindingData;
@@ -49,7 +61,7 @@ namespace AzureFunctionsREST.API.Functions
             {
                 return BuildErrorResponse(requestData, exception, HttpStatusCode.BadRequest);
             }
-            catch (JsonException exception)
+            catch (Exception exception) when (exception is JsonException || exception is ValidationException)
             {
                 return BuildErrorResponse(requestData, exception, HttpStatusCode.UnprocessableEntity);
             }
