@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using AzureFunctionsREST.Domain.Exceptions;
 using AzureFunctionsREST.Domain.Models;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -13,9 +14,11 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
     {
         protected readonly IMongoCollection<T> _collection;
 
-        public GenericRepository(IMongoCollection<T> collection)
+        public GenericRepository(string collectionName, IConfiguration configuration)
         {
-            this._collection = collection;
+            var client = new MongoClient(configuration["MONGODB_CONNECTION_STRING"]);
+            var database = client.GetDatabase(configuration["MONGODB_DBNAME"]);
+            this._collection = database.GetCollection<T>(collectionName);
         }
 
         public virtual T Add(T entity)

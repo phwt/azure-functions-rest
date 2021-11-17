@@ -6,16 +6,10 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
 {
     public class WeatherForecastRepository : GenericRepository<WeatherForecast>
     {
+        private static readonly string _collectionName = "Forecasts";
         public WeatherForecastRepository(IConfiguration configuration)
-                : base(GetDatabaseCollection<WeatherForecast>(configuration["MONGODB_COLLECTION_NAME"],
-                                                              configuration))
+                : base(_collectionName, configuration)
         { }
 
-        public static IMongoCollection<T> GetDatabaseCollection<T>(string collectionName, IConfiguration configuration)
-        {
-            var client = new MongoClient(configuration["MONGODB_CONNECTION_STRING"]);
-            var database = client.GetDatabase(configuration["MONGODB_DBNAME"]);
-            return database.GetCollection<T>(collectionName);
-        }
     }
 }
