@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace AzureFunctionsREST.Domain.Models
 {
-    public class WeatherForecast: BaseMongoModel
+    public class WeatherForecast : BaseMongoModel
     {
         public DateTime Date { get; set; }
 
@@ -16,5 +16,8 @@ namespace AzureFunctionsREST.Domain.Models
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string Reporter { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Station { get; set; }
     }
 }

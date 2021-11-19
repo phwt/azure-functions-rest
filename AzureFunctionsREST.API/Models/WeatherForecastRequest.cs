@@ -8,5 +8,6 @@ namespace AzureFunctionsREST.API.Models
         public int TemperatureC { get; set; }
         public string Summary { get; set; }
         public string Reporter { get; set; }
+        public string Station { get; set; }
     }
 }

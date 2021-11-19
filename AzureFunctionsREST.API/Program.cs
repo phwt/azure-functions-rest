@@ -18,6 +18,7 @@ namespace AzureFunctionsREST.API
                             {
                                 services.AddTransient<IWeatherForecastRepository, WeatherForecastRepository>();
                                 services.AddTransient<IReporterRepository, ReporterRepository>();
+                                services.AddTransient<IStationRepository, StationRepository>();
                             })
                             .ConfigureAppConfiguration(builder => builder.AddEnvironmentVariables())
                             .Build();

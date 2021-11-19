@@ -1,4 +1,3 @@
-using System;
 using AzureFunctionsREST.API.Models;
 using FluentValidation;
 
