@@ -26,31 +26,40 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
             this._stationRepository = stationRepository;
         }
 
+        private object GetPopulation<T>(string fieldToPopulate,
+                                      string[] populate,
+                                      string defaultId,
+                                      Func<T> populationHandler) where T : BaseMongoModel
+        {
+            if (Array.IndexOf(populate, fieldToPopulate) > -1)
+            {
+                try
+                {
+                    return populationHandler();
+                }
+                catch (DocumentNotFoundException)
+                {
+                    return null;
+                }
+            }
+            return defaultId;
+        }
+
         private dynamic PopulateFields(WeatherForecast forecast, string[] populate)
         {
             dynamic populatedWeatherForecast = ModelUtility.ConvertToExpandoObject(forecast);
-            if (Array.IndexOf(populate, "reporter") > -1)
-            {
-                try
-                {
-                    populatedWeatherForecast.reporter = _reporterRepository.Get(new ObjectId(forecast.Reporter));
-                }
-                catch (DocumentNotFoundException)
-                {
-                    populatedWeatherForecast.reporter = null;
-                }
-            }
-            if (Array.IndexOf(populate, "station") > -1)
-            {
-                try
-                {
-                    populatedWeatherForecast.station = _stationRepository.Get(new ObjectId(forecast.Station));
-                }
-                catch (DocumentNotFoundException)
-                {
-                    populatedWeatherForecast.station = null;
-                }
-            }
+            populatedWeatherForecast.reporter = GetPopulation<Reporter>(
+                "reporter",
+                populate,
+                forecast.Reporter,
+                () => { return _reporterRepository.Get(new ObjectId(forecast.Reporter)); });
+
+            populatedWeatherForecast.station = GetPopulation<Station>(
+                "station",
+                populate,
+                forecast.Station,
+                () => { return _stationRepository.Get(new ObjectId(forecast.Station)); });
+
             return populatedWeatherForecast;
         }
 
