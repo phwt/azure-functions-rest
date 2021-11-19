@@ -2,8 +2,8 @@ using System.Net;
 using System.Threading.Tasks;
 using AzureFunctionsREST.API.Models;
 using AzureFunctionsREST.API.Validators;
+using AzureFunctionsREST.Domain.Interfaces;
 using AzureFunctionsREST.Domain.Models;
-using AzureFunctionsREST.Infrastructure.Repositories;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
@@ -15,9 +15,9 @@ namespace AzureFunctionsREST.API.Functions
 {
     public class ReporterFunction : BaseFunction
     {
-        private readonly ReporterRepository _reporterRepository;
+        private readonly IReporterRepository _reporterRepository;
 
-        public ReporterFunction(ReporterRepository reporterRepository)
+        public ReporterFunction(IReporterRepository reporterRepository)
         {
             this._reporterRepository = reporterRepository;
         }

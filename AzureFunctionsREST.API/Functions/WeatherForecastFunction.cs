@@ -2,8 +2,8 @@ using System.Net;
 using System.Threading.Tasks;
 using AzureFunctionsREST.API.Models;
 using AzureFunctionsREST.API.Validators;
+using AzureFunctionsREST.Domain.Interfaces;
 using AzureFunctionsREST.Domain.Models;
-using AzureFunctionsREST.Infrastructure.Repositories;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
@@ -15,9 +15,9 @@ namespace AzureFunctionsREST.API.Functions
 {
     public class WeatherForecastFunction : BaseFunction
     {
-        private readonly WeatherForecastRepository _weatherForecastRepository;
+        private readonly IWeatherForecastRepository _weatherForecastRepository;
 
-        public WeatherForecastFunction(WeatherForecastRepository weatherForecastRepository)
+        public WeatherForecastFunction(IWeatherForecastRepository weatherForecastRepository)
         {
             this._weatherForecastRepository = weatherForecastRepository;
         }

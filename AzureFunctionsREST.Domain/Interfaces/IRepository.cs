@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using MongoDB.Bson;
 
-namespace AzureFunctionsREST.Infrastructure.Repositories
+namespace AzureFunctionsREST.Domain.Interfaces
 {
     public interface IRepository<T>
     {
@@ -12,5 +12,6 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
         T Get(ObjectId id);
         IEnumerable<T> All();
         IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
+        T Delete(ObjectId id);
     }
 }

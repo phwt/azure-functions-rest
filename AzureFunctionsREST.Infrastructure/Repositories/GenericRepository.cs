@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using AzureFunctionsREST.Domain.Exceptions;
+using AzureFunctionsREST.Domain.Interfaces;
 using AzureFunctionsREST.Domain.Models;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
@@ -55,7 +56,7 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
 
         public virtual T Delete(ObjectId id)
         {
-            var deletedDocument = _collection.FindOneAndDelete(document => document.Id.Equals(id)); // TODO: Change to mark as deleted
+            var deletedDocument = _collection.FindOneAndDelete(document => document.Id.Equals(id));
             if (deletedDocument == null) throw new DocumentNotFoundException();
             return deletedDocument;
         }
