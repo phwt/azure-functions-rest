@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AzureFunctionsREST.Domain.Exceptions;
 using AzureFunctionsREST.Domain.Interfaces;
 using AzureFunctionsREST.Domain.Models;
 using AzureFunctionsREST.Domain.Utilities;
@@ -30,11 +31,25 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
             dynamic populatedWeatherForecast = ModelUtility.ConvertToExpandoObject(forecast);
             if (Array.IndexOf(populate, "reporter") > -1)
             {
-                populatedWeatherForecast.reporter = _reporterRepository.Get(new ObjectId(forecast.Reporter));
+                try
+                {
+                    populatedWeatherForecast.reporter = _reporterRepository.Get(new ObjectId(forecast.Reporter));
+                }
+                catch (DocumentNotFoundException)
+                {
+                    populatedWeatherForecast.reporter = null;
+                }
             }
             if (Array.IndexOf(populate, "station") > -1)
             {
-                populatedWeatherForecast.station = _stationRepository.Get(new ObjectId(forecast.Station));
+                try
+                {
+                    populatedWeatherForecast.station = _stationRepository.Get(new ObjectId(forecast.Station));
+                }
+                catch (DocumentNotFoundException)
+                {
+                    populatedWeatherForecast.station = null;
+                }
             }
             return populatedWeatherForecast;
         }
