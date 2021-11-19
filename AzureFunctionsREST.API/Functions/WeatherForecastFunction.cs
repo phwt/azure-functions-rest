@@ -42,6 +42,7 @@ namespace AzureFunctionsREST.API.Functions
         [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Retrieve weather forecast")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiParameter(name: "weatherForecastId", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
+        [OpenApiParameter(name: "populate", In = ParameterLocation.Query, Type = typeof(string[]))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast),
             Description = "Weather forecast")]
         public async Task<HttpResponseData> Get([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather/{weatherForecastId:required}")] HttpRequestData req,
@@ -50,9 +51,19 @@ namespace AzureFunctionsREST.API.Functions
             return await RequestWrapper(req, async response =>
             {
                 string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
+                object populateObject;
+                bool havePopulate = ExtractBindingData(executionContext).TryGetValue("populate", out populateObject);
 
-                var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId));
-                await response.WriteAsJsonAsync(result);
+                if (havePopulate)
+                {
+                    var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId), populateObject.ToString().Split(","));
+                    await response.WriteAsJsonAsync((object)result);
+                }
+                else
+                {
+                    var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId));
+                    await response.WriteAsJsonAsync(result);
+                }
                 return response;
             });
         }
