@@ -20,17 +20,22 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
             this._reporterRepository = reporterRepository;
         }
 
+        private dynamic PopulateFields(WeatherForecast forecast, string[] populate)
+        {
+            dynamic populatedWeatherForecast = ModelUtility.ConvertToExpandoObject(forecast);
+            if (Array.IndexOf(populate, "reporter") > -1)
+            {
+                populatedWeatherForecast.reporter = _reporterRepository.Get(new ObjectId(forecast.Reporter));
+            }
+            return populatedWeatherForecast;
+        }
+
         public dynamic[] All(string[] populate)
         {
             IEnumerable<WeatherForecast> weatherForecasts = All();
             IEnumerable<dynamic> populatedWeatherForecasts = weatherForecasts.Select(forecast =>
              {
-                 dynamic populatedWeatherForecast = ModelUtility.ConvertToExpandoObject(forecast);
-                 if (Array.IndexOf(populate, "reporter") > -1)
-                 {
-                     populatedWeatherForecast.reporter = _reporterRepository.Get(new ObjectId(forecast.Reporter));
-                 }
-                 return populatedWeatherForecast;
+                 return PopulateFields(forecast, populate);
              });
             return populatedWeatherForecasts.ToArray();
         }
@@ -38,12 +43,7 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
         public dynamic Get(ObjectId id, string[] populate)
         {
             WeatherForecast weatherForecast = Get(id);
-            dynamic populatedWeatherForecast = ModelUtility.ConvertToExpandoObject(weatherForecast);
-            if (Array.IndexOf(populate, "reporter") > -1)
-            {
-                populatedWeatherForecast.reporter = _reporterRepository.Get(new ObjectId(weatherForecast.Reporter));
-            }
-            return populatedWeatherForecast;
+            return PopulateFields(weatherForecast, populate);
         }
 
     }

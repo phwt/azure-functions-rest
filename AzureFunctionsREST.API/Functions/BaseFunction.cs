@@ -70,5 +70,12 @@ namespace AzureFunctionsREST.API.Functions
                 throw;
             }
         }
+
+        protected string[] GetPopulationField(FunctionContext functionContext)
+        {
+            object populateObject;
+            bool havePopulate = ExtractBindingData(functionContext).TryGetValue("populate", out populateObject);
+            return havePopulate ? populateObject.ToString().Split(',') : new string[] { };
+        }
     }
 }

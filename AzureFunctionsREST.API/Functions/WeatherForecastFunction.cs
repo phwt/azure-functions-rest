@@ -33,17 +33,16 @@ namespace AzureFunctionsREST.API.Functions
         {
             return await RequestWrapper(req, async response =>
             {
-                object populateObject;
-                bool havePopulate = ExtractBindingData(executionContext).TryGetValue("populate", out populateObject);
+                var populateFields = GetPopulationField(executionContext);
 
-                if (havePopulate)
+                if (populateFields.Length == 0)
                 {
-                    var result = this._weatherForecastRepository.All(populateObject.ToString().Split(","));
-                    await response.WriteAsJsonAsync((object[])result);
+                    var result = this._weatherForecastRepository.All();
+                    await response.WriteAsJsonAsync(result);
                 }
                 else
                 {
-                    var result = this._weatherForecastRepository.All();
+                    var result = this._weatherForecastRepository.All(populateFields);
                     await response.WriteAsJsonAsync(result);
                 }
                 return response;
@@ -63,18 +62,17 @@ namespace AzureFunctionsREST.API.Functions
             return await RequestWrapper(req, async response =>
             {
                 string weatherForecastId = ExtractBindingData(executionContext)["weatherForecastId"].ToString();
-                object populateObject;
-                bool havePopulate = ExtractBindingData(executionContext).TryGetValue("populate", out populateObject);
+                var populateFields = GetPopulationField(executionContext);
 
-                if (havePopulate)
-                {
-                    var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId), populateObject.ToString().Split(","));
-                    await response.WriteAsJsonAsync((object)result);
-                }
-                else
+                if (populateFields.Length == 0)
                 {
                     var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId));
                     await response.WriteAsJsonAsync(result);
+                }
+                else
+                {
+                    var result = this._weatherForecastRepository.Get(new ObjectId(weatherForecastId), populateFields);
+                    await response.WriteAsJsonAsync((object)result);
                 }
                 return response;
             });
