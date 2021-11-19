@@ -25,6 +25,7 @@ namespace AzureFunctionsREST.API.Functions
         [Function("WeatherForecastList")]
         [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Retrieve all weather forecasts")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiParameter(name: "populate", In = ParameterLocation.Query, Type = typeof(string[]))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast[]),
             Description = "All weather forecasts")]
         public async Task<HttpResponseData> List([HttpTrigger(AuthorizationLevel.Function, "get", Route = "weather")] HttpRequestData req,
@@ -32,8 +33,19 @@ namespace AzureFunctionsREST.API.Functions
         {
             return await RequestWrapper(req, async response =>
             {
-                var result = this._weatherForecastRepository.All();
-                await response.WriteAsJsonAsync(result);
+                object populateObject;
+                bool havePopulate = ExtractBindingData(executionContext).TryGetValue("populate", out populateObject);
+
+                if (havePopulate)
+                {
+                    var result = this._weatherForecastRepository.All(populateObject.ToString().Split(","));
+                    await response.WriteAsJsonAsync((object[])result);
+                }
+                else
+                {
+                    var result = this._weatherForecastRepository.All();
+                    await response.WriteAsJsonAsync(result);
+                }
                 return response;
             });
         }
