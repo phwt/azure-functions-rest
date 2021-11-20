@@ -4,6 +4,7 @@ using AzureFunctionsREST.API.Models;
 using AzureFunctionsREST.API.Validators;
 using AzureFunctionsREST.Domain.Interfaces;
 using AzureFunctionsREST.Domain.Models;
+using AzureFunctionsREST.Domain.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
@@ -16,15 +17,19 @@ namespace AzureFunctionsREST.API.Functions
     public class WeatherForecastFunction : BaseFunction
     {
         private readonly IWeatherForecastRepository _weatherForecastRepository;
+        private readonly WeatherForecastService _weatherForecastService;
 
-        public WeatherForecastFunction(IWeatherForecastRepository weatherForecastRepository)
+        public WeatherForecastFunction(IWeatherForecastRepository weatherForecastRepository, WeatherForecastService weatherForecastService)
         {
             this._weatherForecastRepository = weatherForecastRepository;
+            this._weatherForecastService = weatherForecastService;
         }
 
         [Function("WeatherForecastList")]
         [OpenApiOperation(tags: new[] { "forecast" }, Summary = "Retrieve all weather forecasts")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiParameter(name: "reporterId", In = ParameterLocation.Query, Type = typeof(string))]
+        [OpenApiParameter(name: "stationId", In = ParameterLocation.Query, Type = typeof(string))]
         [OpenApiParameter(name: "populate", In = ParameterLocation.Query, Type = typeof(string[]))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(WeatherForecast[]),
             Description = "All weather forecasts")]
@@ -37,7 +42,9 @@ namespace AzureFunctionsREST.API.Functions
 
                 if (populateFields.Length == 0)
                 {
-                    var result = this._weatherForecastRepository.All();
+                    var reporterId = TryGetParameter(executionContext, "reporterId");
+                    var stationId = TryGetParameter(executionContext, "stationId");
+                    var result = this._weatherForecastService.Filter(reporterId, stationId);
                     await response.WriteAsJsonAsync(result);
                 }
                 else

@@ -8,6 +8,7 @@ using AzureFunctionsREST.Domain.Exceptions;
 using FluentValidation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace AzureFunctionsREST.API.Functions
 {
@@ -38,6 +39,14 @@ namespace AzureFunctionsREST.API.Functions
         }
 
         protected IReadOnlyDictionary<string, object> ExtractBindingData(FunctionContext functionContext) => functionContext.BindingContext.BindingData;
+
+        protected string TryGetParameter(FunctionContext functionContext, string parameterName)
+        {
+
+            object parameterObject;
+            bool haveParameter = ExtractBindingData(functionContext).TryGetValue(parameterName, out parameterObject);
+            return haveParameter ? parameterObject.ToString() : null;
+        }
 
         private HttpResponseData BuildErrorResponse(HttpRequestData requestData, Exception exception, HttpStatusCode statusCode)
         {

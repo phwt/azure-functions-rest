@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace AzureFunctionsREST.Domain.Interfaces
 {
@@ -11,7 +10,7 @@ namespace AzureFunctionsREST.Domain.Interfaces
         T Update(T entity);
         T Get(ObjectId id);
         IEnumerable<T> All();
-        IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
+        IEnumerable<T> Find(FilterDefinition<T> filter);
         T Delete(ObjectId id);
     }
 }

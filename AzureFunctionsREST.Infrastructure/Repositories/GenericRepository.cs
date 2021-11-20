@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using AzureFunctionsREST.Domain.Exceptions;
 using AzureFunctionsREST.Domain.Interfaces;
 using AzureFunctionsREST.Domain.Models;
@@ -33,9 +31,9 @@ namespace AzureFunctionsREST.Infrastructure.Repositories
             return _collection.Find(_ => true).ToEnumerable();
         }
 
-        public virtual IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+        public virtual IEnumerable<T> Find(FilterDefinition<T> filter)
         {
-            return _collection.Find(predicate).ToEnumerable();
+            return _collection.Find(filter).ToEnumerable();
         }
 
         public virtual T Get(ObjectId id)

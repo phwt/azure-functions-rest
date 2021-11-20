@@ -4,6 +4,7 @@ using AzureFunctionsREST.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
 using AzureFunctionsREST.Domain.Interfaces;
+using AzureFunctionsREST.Domain.Services;
 
 namespace AzureFunctionsREST.API
 {
@@ -19,6 +20,8 @@ namespace AzureFunctionsREST.API
                                 services.AddTransient<IWeatherForecastRepository, WeatherForecastRepository>();
                                 services.AddTransient<IReporterRepository, ReporterRepository>();
                                 services.AddTransient<IStationRepository, StationRepository>();
+
+                                services.AddTransient<WeatherForecastService>();
                             })
                             .ConfigureAppConfiguration(builder => builder.AddEnvironmentVariables())
                             .Build();
